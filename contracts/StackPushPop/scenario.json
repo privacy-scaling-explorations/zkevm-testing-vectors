@@ -1,0 +1,47 @@
+{
+    "accounts": {
+        "account{0}": "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"
+    },
+    "linkReferences": {},
+    "transactions": [
+        {
+            "timestamp": 1624617589253,
+            "record": {
+                "value": "0",
+                "parameters": [],
+                "abi": "0x0d28aefedfa9c55317531f0e60f34ce2e3cb691fe9d315ee79d09918c86c2d24",
+                "contractName": "StackPushPop",
+                "bytecode": "6080604052348015600f57600080fd5b50607480601d6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c806394e9df3514602d575b600080fd5b60336035565b005b6000600890505056fea2646970667358221220220aa5b4906b47580ddefce17828e147eeecb28150f21c92b412612566f370b964736f6c63430008060033",
+                "linkReferences": {},
+                "name": "",
+                "inputs": "()",
+                "type": "constructor",
+                "from": "account{0}"
+            }
+        },
+        {
+            "timestamp": 1624617636764,
+            "record": {
+                "value": "0",
+                "parameters": [],
+                "to": "created{1624617589253}",
+                "abi": "0x0d28aefedfa9c55317531f0e60f34ce2e3cb691fe9d315ee79d09918c86c2d24",
+                "name": "push_pop",
+                "inputs": "()",
+                "type": "function",
+                "from": "account{0}"
+            }
+        }
+    ],
+    "abis": {
+        "0x0d28aefedfa9c55317531f0e60f34ce2e3cb691fe9d315ee79d09918c86c2d24": [
+            {
+                "inputs": [],
+                "name": "push_pop",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ]
+    }
+}

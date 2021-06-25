@@ -1,0 +1,83 @@
+[
+    {
+        "inputs": [],
+        "name": "push_pop",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "step-details": [
+            {
+                "opcode": "PUSH1 00",
+                "vm trace step": 29,
+                "execution step": 29,
+                "add memory": "",
+                "gas": "3",
+                "remaining gas": "79978823",
+                "loaded address": "0xd9145CCE52D386f254917e481eB44e9943F39138"
+            },
+            {
+                "opcode": "PUSH1 00",
+                "vm trace step": 30,
+                "execution step": 30,
+                "add memory": "",
+                "gas": "3",
+                "remaining gas": "79978820",
+                "loaded address": "0xd9145CCE52D386f254917e481eB44e9943F39138"
+            },
+            {
+                "opcode": "SWAP1",
+                "vm trace step": 31,
+                "execution step": 31,
+                "add memory": "",
+                "gas": "3",
+                "remaining gas": "79978817",
+                "loaded address": "0xd9145CCE52D386f254917e481eB44e9943F39138"
+            },
+            {
+                "opcode": "POP",
+                "vm trace step": 32,
+                "execution step": 32,
+                "add memory": "",
+                "gas": "2",
+                "remaining gas": "79978814",
+                "loaded address": "0xd9145CCE52D386f254917e481eB44e9943F39138"
+            },
+            {
+                "opcode": "POP",
+                "vm trace step": 33,
+                "execution step": 33,
+                "add memory": "",
+                "gas": "2",
+                "remaining gas": "79978812",
+                "loaded address": "0xd9145CCE52D386f254917e481eB44e9943F39138"
+            },
+            {
+                "opcode": "JUMP",
+                "vm trace step": 34,
+                "execution step": 34,
+                "add memory": "",
+                "gas": "8",
+                "remaining gas": "79978810",
+                "loaded address": "0xd9145CCE52D386f254917e481eB44e9943F39138"
+            },
+            {
+                "opcode": "JUMPDEST",
+                "vm trace step": 35,
+                "execution step": 35,
+                "add memory": "",
+                "gas": "1",
+                "remaining gas": "79978802",
+                "loaded address": "0xd9145CCE52D386f254917e481eB44e9943F39138"
+            },
+            {
+                "opcode": "STOP",
+                "vm trace step": 36,
+                "execution step": 36,
+                "add memory": "",
+                "gas": "0",
+                "remaining gas": "79978801",
+                "loaded address": "0xd9145CCE52D386f254917e481eB44e9943F39138"
+            }
+        ]
+    }
+]
