@@ -128,17 +128,29 @@ async function StartPushPop(
     }
 }
 
+type MemoryMapping = { [address: string]: string }
+
 interface BusValue {
-    memory: string;
+    memory: MemoryMapping;
     stack: string[];
     opcode: string;
     pc: number;
 }
 
+function formatMem(memory: Buffer, memoryWordCount: BN): MemoryMapping {
+    const count = memoryWordCount.toNumber()
+    const result: MemoryMapping = {}
+    for (let i = 0; i < count; i++) {
+        const offset = i * 32
+        result[offset.toString(16)] = memory.slice(offset, offset + 32).toString('hex')
+    }
+    return result
+}
+
 
 function toBusMapping(data: any): BusValue {
     return {
-        memory: data.memory.toString('hex'),
+        memory: formatMem(data.memory, data.memoryWordCount),
         stack: data.stack.map((x: BN) => x.toString('hex')),
         opcode: data.opcode.name,
         pc: data.pc
