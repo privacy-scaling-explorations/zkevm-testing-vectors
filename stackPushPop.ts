@@ -121,11 +121,7 @@ async function StartPushPop(
 
     const tx = Transaction.fromTxData(txData).sign(senderPrivateKey)
 
-    const setGreetingResult = await vm.runTx({ tx })
-
-    if (setGreetingResult.execResult.exceptionError) {
-        throw setGreetingResult.execResult.exceptionError
-    }
+    return tx
 }
 
 type MemoryMapping = { [address: string]: string }
@@ -155,6 +151,26 @@ function toBusMapping(data: any): BusValue {
         opcode: data.opcode.name,
         pc: data.pc
     }
+}
+
+async function recordTxTrace(vm: VM, tx: Transaction, outputPath: string) {
+    const vmTrace: BusValue[] = []
+    function listener(data: any) {
+        const trace = toBusMapping(data)
+        console.log(trace)
+        vmTrace.push(trace)
+    }
+    vm.on('step', listener)
+    const result = await vm.runTx({ tx })
+
+    if (result.execResult.exceptionError) {
+        throw result.execResult.exceptionError
+    }
+
+    vm.off('step', listener)
+
+    writeFileSync(outputPath, JSON.stringify(vmTrace, undefined, 4))
+
 }
 
 async function main() {
@@ -194,19 +210,13 @@ async function main() {
 
     const contractAddress = await deployContract(vm, accountPk, bytecode)
 
-    const vmTrace: BusValue[] = []
-    vm.on('step', function (data: any) {
-        const trace = toBusMapping(data)
-        console.log(trace)
-        vmTrace.push(trace)
-    })
-
     console.log('Contract address:', contractAddress.toString())
 
-    await StartPushPop(vm, accountPk, contractAddress,)
+    const tx = await StartPushPop(vm, accountPk, contractAddress,)
 
-    console.log('Everything run correctly!')
-    writeFileSync("contracts/StackPushPop/vmTrace.json", JSON.stringify(vmTrace, undefined, 4))
+    await recordTxTrace(vm, tx, "contracts/StackPushPop/vmTrace.json")
+    const tx2 = await StartPushPop(vm, accountPk, contractAddress,)
+    await recordTxTrace(vm, tx2, "contracts/StackPushPop/vmTrace2.json")
 
 }
 
