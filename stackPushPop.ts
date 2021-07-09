@@ -1,9 +1,11 @@
 import { join } from 'path'
 import { readFileSync, writeFileSync } from 'fs'
 import { AbiCoder, Interface } from "@ethersproject/abi"
+import { BigNumber } from "@ethersproject/bignumber"
 import { Account, Address, BN } from 'ethereumjs-util'
 import { Transaction } from '@ethereumjs/tx'
 import VM from '@ethereumjs/vm'
+import { relative } from 'path/posix'
 const solc = require('solc')
 
 
@@ -124,16 +126,22 @@ async function build_tx(
     contractAddress: Address,
     signature: string,
     fn: string,
-    call_params?: string,
+    call_params?: any,
 ) {
-    const params = AbiCoder.encode(['string'], [call_params])
     const sigHash = new Interface([signature]).getSighash(fn);
+    var data = sigHash;
+    if (call_params != null) {
+        const abiCoderinst = new AbiCoder
+        const params = abiCoderinst.encode(['uint256'], [call_params])
+        data = sigHash + params.slice(2)
+    }
+
     const txData = {
         to: contractAddress,
         value: 0,
         gasLimit: 2000000, // We assume that 2M is enough,
         gasPrice: 1,
-        data: sigHash + params.slice(2),
+        data: data,
         nonce: await getAccountNonce(vm, senderPrivateKey),
     }
 
@@ -241,7 +249,7 @@ async function main() {
     const tx2 = await build_tx(vm, accountPk, memoryContractAddress, 'function memory_sample()', 'memory_sample')
     await recordTxTrace(vm, tx2, "contracts/Memory/vmTrace.json")
     // Call Storage
-    const tx3 = await build_tx(vm, accountPk, storageContractAddress, 'function storage()', 'storage')
+    const tx3 = await build_tx(vm, accountPk, storageContractAddress, 'function storage()', 'storage', BigNumber.from(8).toString())
     await recordTxTrace(vm, tx3, "contracts/Storage/vmTrace.json")
 
 }
