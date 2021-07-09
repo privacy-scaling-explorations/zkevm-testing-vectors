@@ -1,9 +1,11 @@
 import { join } from 'path'
 import { readFileSync, writeFileSync } from 'fs'
-import { Interface } from "@ethersproject/abi"
+import { AbiCoder, Interface } from "@ethersproject/abi"
+import { BigNumber } from "@ethersproject/bignumber"
 import { Account, Address, BN } from 'ethereumjs-util'
 import { Transaction } from '@ethereumjs/tx'
 import VM from '@ethereumjs/vm'
+import { relative } from 'path/posix'
 const solc = require('solc')
 
 
@@ -20,7 +22,12 @@ function getSolcInput() {
             'contracts/StackPushPop.sol': {
                 content: readFileSync(join(__dirname, 'contracts', 'StackPushPop', 'StackPushPop.sol'), 'utf8'),
             },
-            // If more contracts were to be compiled, they should have their own entries here
+            'contracts/Storage.sol': {
+                content: readFileSync(join(__dirname, 'contracts', 'Storage', 'Storage.sol'), 'utf8'),
+            },
+            'contracts/Memory.sol': {
+                content: readFileSync(join(__dirname, 'contracts', 'Memory', 'Memory.sol'), 'utf8'),
+            },
         },
         settings: {
             optimizer: {
@@ -71,6 +78,15 @@ function getStackPushPopDeploymentBytecode(solcOutput: any): any {
     return solcOutput.contracts['contracts/StackPushPop.sol'].StackPushPop.evm.bytecode.object
 }
 
+function getMemoryDeploymentBytecode(solcOutput: any): any {
+    console.log(solcOutput.contracts)
+    return solcOutput.contracts['contracts/Memory.sol'].Memory.evm.bytecode.object
+}
+
+function getStorageDeploymentBytecode(solcOutput: any): any {
+    return solcOutput.contracts['contracts/Storage.sol'].Storage.evm.bytecode.object
+}
+
 async function getAccountNonce(vm: VM, accountPrivateKey: Buffer) {
     const address = Address.fromPrivateKey(accountPrivateKey)
     const account = await vm.stateManager.getAccount(address)
@@ -104,18 +120,28 @@ async function deployContract(
     return deploymentResult.createdAddress!
 }
 
-async function StartPushPop(
+async function build_tx(
     vm: VM,
     senderPrivateKey: Buffer,
     contractAddress: Address,
+    signature: string,
+    fn: string,
+    call_params?: any,
 ) {
-    const sigHash = new Interface(['function push_pop()']).getSighash('push_pop')
+    const sigHash = new Interface([signature]).getSighash(fn);
+    var data = sigHash;
+    if (call_params != null) {
+        const abiCoderinst = new AbiCoder
+        const params = abiCoderinst.encode(['uint256'], [call_params])
+        data = sigHash + params.slice(2)
+    }
+
     const txData = {
         to: contractAddress,
         value: 0,
         gasLimit: 2000000, // We assume that 2M is enough,
         gasPrice: 1,
-        data: sigHash /*+ params.slice(2)*/,
+        data: data,
         nonce: await getAccountNonce(vm, senderPrivateKey),
     }
 
@@ -204,19 +230,27 @@ async function main() {
         console.log('Compiled the contract')
     }
 
-    const bytecode = getStackPushPopDeploymentBytecode(solcOutput)
+    const stackBytecode = getStackPushPopDeploymentBytecode(solcOutput);
+    const memoryBytecode = getMemoryDeploymentBytecode(solcOutput);
+    const storageBytecode = getStorageDeploymentBytecode(solcOutput);
 
-    console.log('Deploying the contract...')
 
-    const contractAddress = await deployContract(vm, accountPk, bytecode)
+    console.log('Deploying the contracts...')
 
-    console.log('Contract address:', contractAddress.toString())
+    const stackContractAddress = await deployContract(vm, accountPk, stackBytecode)
+    const memoryContractAddress = await deployContract(vm, accountPk, memoryBytecode)
+    const storageContractAddress = await deployContract(vm, accountPk, storageBytecode)
 
-    const tx = await StartPushPop(vm, accountPk, contractAddress,)
 
+    // Call StackPushPop 
+    const tx = await build_tx(vm, accountPk, stackContractAddress, 'function push_pop()', 'push_pop')
     await recordTxTrace(vm, tx, "contracts/StackPushPop/vmTrace.json")
-    const tx2 = await StartPushPop(vm, accountPk, contractAddress,)
-    await recordTxTrace(vm, tx2, "contracts/StackPushPop/vmTrace2.json")
+    // Call Memory
+    const tx2 = await build_tx(vm, accountPk, memoryContractAddress, 'function memory_sample()', 'memory_sample')
+    await recordTxTrace(vm, tx2, "contracts/Memory/vmTrace.json")
+    // Call Storage
+    const tx3 = await build_tx(vm, accountPk, storageContractAddress, 'function store(uint256)', 'store', BigNumber.from(8).toString())
+    await recordTxTrace(vm, tx3, "contracts/Storage/vmTrace.json")
 
 }
 
