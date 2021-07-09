@@ -249,7 +249,7 @@ async function main() {
     const tx2 = await build_tx(vm, accountPk, memoryContractAddress, 'function memory_sample()', 'memory_sample')
     await recordTxTrace(vm, tx2, "contracts/Memory/vmTrace.json")
     // Call Storage
-    const tx3 = await build_tx(vm, accountPk, storageContractAddress, 'function storage()', 'storage', BigNumber.from(8).toString())
+    const tx3 = await build_tx(vm, accountPk, storageContractAddress, 'function store(uint256)', 'store', BigNumber.from(8).toString())
     await recordTxTrace(vm, tx3, "contracts/Storage/vmTrace.json")
 
 }
