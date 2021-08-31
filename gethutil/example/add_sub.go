@@ -15,9 +15,9 @@ import (
 func main() {
 	address := common.BytesToAddress([]byte{0xff})
 	asm := gethutil.NewAssembly().Add(0xdeadbeef, 0xcafeb0ba).Sub(0xfaceb00c, 0xb0bacafe)
-	contracts := []gethutil.Contract{{Address: address, Asm: asm}}
+	contracts := []gethutil.Contract{{Address: address, Bytecode: asm.Bytecode}}
 
-	logs, err := gethutil.Trace(address, nil, &runtime.Config{GasLimit: 100}, contracts)
+	logs, err := gethutil.TraceTx(address, nil, &runtime.Config{GasLimit: 100}, contracts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}

@@ -62,18 +62,18 @@ func FormatLogs(logs []vm.StructLog) []StructLogRes {
 }
 
 type Contract struct {
-	Address common.Address
-	Asm     *asm
+	Address  common.Address
+	Bytecode []byte
 }
 
-func Trace(toAddress common.Address, calldata []byte, config *runtime.Config, contracts []Contract) ([]StructLogRes, error) {
+func TraceTx(toAddress common.Address, calldata []byte, config *runtime.Config, contracts []Contract) ([]StructLogRes, error) {
 	// Overwrite state
 	newState, err := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()), nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize new state")
 	}
 	for _, contract := range contracts {
-		newState.SetCode(contract.Address, contract.Asm.Bytecode)
+		newState.SetCode(contract.Address, contract.Bytecode)
 	}
 	config.State = newState
 
@@ -90,3 +90,5 @@ func Trace(toAddress common.Address, calldata []byte, config *runtime.Config, co
 
 	return FormatLogs(tracer.StructLogs()), nil
 }
+
+// TODO: TraceBlock
