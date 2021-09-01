@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -19,13 +18,13 @@ func main() {
 
 	logs, err := gethutil.TraceTx(address, nil, &runtime.Config{GasLimit: 100}, contracts)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintf(os.Stderr, "failed to trace tx, err: %v\n", err)
 	}
 
 	bytes, err := json.MarshalIndent(logs, "", "  ")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintf(os.Stderr, "failed to marshal logs, err: %v\n", err)
 	}
 
-	ioutil.WriteFile("./output/mstore_mload.json", bytes, 0644)
+	fmt.Fprintln(os.Stdout, string(bytes))
 }
