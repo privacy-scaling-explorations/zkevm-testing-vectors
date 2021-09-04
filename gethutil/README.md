@@ -9,8 +9,8 @@ The module `gethutil` tried to provide identical output from APIs `debug_trace*`
 
 ### Library Usage
 
-For [`./example/mstore_mload.go`](./example/mstore_mload.go) as an example, it defines bytecode directly by builder `asm`, then write the logs produced by `TraceTx` into `./output/mstore_mload.json`. To reproduce the logs, run:
+For [`./example/mstore_mload.go`](./example/mstore_mload.go) as an example, it defines bytecode directly by builder `asm`, then write the logs produced by `TraceTx` to stdout. To reproduce the logs, run:
 
 ```bash
-go run ./example/mstore_mload.go
+go run ./example/mstore_mload.go > ./mstore_mload.json
 ```
