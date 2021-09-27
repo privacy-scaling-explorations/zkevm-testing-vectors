@@ -78,9 +78,9 @@ func TraceTx(toAddress common.Address, calldata []byte, config *runtime.Config, 
 	config.State = newState
 
 	// Overwrite config with tracer
-	tracer := vm.StructLogger{}
+	tracer := vm.NewStructLogger(&vm.LogConfig{})
 	config.EVMConfig.Debug = true
-	config.EVMConfig.Tracer = &tracer
+	config.EVMConfig.Tracer = tracer
 
 	_, _, err = runtime.Call(toAddress, nil, config)
 
