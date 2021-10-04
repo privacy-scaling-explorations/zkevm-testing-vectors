@@ -13,10 +13,10 @@ import (
 
 func main() {
 	address := common.BytesToAddress([]byte{0xff})
-	asm := gethutil.NewAssembly().MStore(0x40, 0x80).MLoad(0x40)
+	asm := gethutil.NewAssembly().SStore(0, 0xcafeb0ba).SLoad(0).SStore(0, 0xdeabbeef).SLoad(0)
 	contracts := []gethutil.Account{{Address: address, Bytecode: asm.Bytecode}}
 
-	logs, err := gethutil.TraceTx(&address, nil, &runtime.Config{GasLimit: 100}, contracts)
+	logs, err := gethutil.TraceTx(&address, nil, &runtime.Config{GasLimit: 25000}, contracts)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to trace tx, err: %v\n", err)
 	}
